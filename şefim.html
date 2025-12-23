@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İRFAN: GOD MODE</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Roboto:wght@400;700&display=swap');
+
+        /* --- GENEL AYARLAR --- */
+        body {
+            background-color: #0b0b0b;
+            color: #fff;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            overflow-x: hidden;
+            padding-bottom: 20px;
+        }
+
+        /* --- GİRİŞ EKRANI --- */
+        #splash {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transition: opacity 1s;
+        }
+
+        .god-title {
+            font-family: 'Black Ops One', cursive;
+            font-size: 3.5rem;
+            color: #D4AF37;
+            text-shadow: 0 0 20px rgba(212,175,55,0.8);
+            margin: 0;
+            letter-spacing: 2px;
+        }
+
+        .god-sub {
+            color: #aaa;
+            font-size: 1rem;
+            margin-top: 10px;
+            border-top: 1px solid #333;
+            border-bottom: 1px solid #333;
+            padding: 10px 0;
+            width: 80%;
+        }
+
+        .enter-btn {
+            margin-top: 40px;
+            background: transparent;
+            border: 2px solid #D4AF37;
+            color: #D4AF37;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(212,175,55,0.2);
+            transition: 0.3s;
+        }
+        .enter-btn:hover { background: #D4AF37; color: #000; }
+
+        /* --- ANA PANEL --- */
+        #main-app { display: none; padding: 15px; max-width: 500px; margin: 0 auto; }
+
+        .header-profile {
+            background: linear-gradient(180deg, #222, #111);
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #D4AF37;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(212,175,55,0.15);
+        }
+
+        .header-profile h1 { margin: 0; color: #D4AF37; font-family: 'Black Ops One', cursive; }
+        .header-profile p { margin: 5px 0 0; color: #888; font-size: 0.9rem; }
+
+        /* --- KARAKTER KARTLARI (KÖLELER) --- */
+        .minion-card {
+            background: #161616;
+            border: 1px solid #333;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            transition: transform 0.1s;
+        }
+
+        .minion-header {
+            background: #202020;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+
+        .minion-name { font-weight: bold; font-size: 1.1rem; color: #fff; }
+        .minion-title { font-size: 0.75rem; color: #ff4444; text-transform: uppercase; font-weight: bold; }
+        
+        .minion-body { padding: 15px; }
+
+        /* Tırsma Metresi */
+        .fear-meter-box { margin-bottom: 15px; }
+        .fear-label { font-size: 0.7rem; color: #aaa; display: flex; justify-content: space-between; }
+        .progress-bg { background: #333; height: 8px; border-radius: 4px; margin-top: 5px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #ff9900, #ff0000); width: 10%; transition: width 0.3s; }
+
+        /* Durum Yazısı */
+        .status-msg {
+            font-size: 0.9rem;
+            color: #ddd;
+            font-style: italic;
+            min-height: 40px;
+            border-left: 3px solid #555;
+            padding-left: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Kontrol Butonları Grid */
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .cmd-btn {
+            background: #2a2a2a;
+            border: none;
+            color: #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        .cmd-btn:active { transform: scale(0.95); background: #fff; color: #000; }
+        .cmd-icon { font-size: 1.2rem; }
+
+        /* --- HASAN KARTI (SAĞ KOL) --- */
+        .hasan-card {
+            border-color: #3498db;
+            background: linear-gradient(180deg, #111, #162430);
+        }
+        .hasan-card .minion-title { color: #3498db; }
+        .consult-btn {
+            width: 100%;
+            background: #3498db;
+            color: #fff;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        /* TİTREŞİM EFEKTİ İÇİN */
+        .shake { animation: shake 0.5s; }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="splash">
+        <div class="god-title">İMPARATOR<br>İRFAN</div>
+        <div class="god-sub">
+            Eskişehir'in Hakkarili Delikanlısı<br>
+            Yüceler Yücesi Başkomutan
+        </div>
+        <button class="enter-btn" onclick="openApp()">YÖNETİME GEÇ</button>
+    </div>
+
+    <div id="main-app">
+        
+        <div class="header-profile">
+            <h1>İRFAN BEY</h1>
+            <p>Otorite: %100 | Mod: EFSANE</p>
+        </div>
+
+        <div class="minion-card" id="card-berat">
+            <div class="minion-header">
+                <span class="minion-name">BERAT</span>
+                <span class="minion-title">AYAK İŞLERİ BAKANI</span>
+            </div>
+            <div class="minion-body">
+                <div class="fear-meter-box">
+                    <div class="fear-label"><span>Korku Seviyesi</span><span id="fear-val-berat">%10</span></div>
+                    <div class="progress-bg"><div class="progress-fill" id="fear-bar-berat" style="width: 10%"></div></div>
+                </div>
+                
+                <div class="status-msg" id="msg-berat">"Emirlerinizi bekliyorum şefim..."</div>
+
+                <div class="action-grid">
+                    <button class="cmd-btn" onclick="interact('berat', 'bakkal')">
+                        <span class="cmd-icon">🍞</span>Bakkala Yolla
+                    </button>
+                    <button class="cmd-btn" onclick="interact('berat', 'temizlik')">
+                        <span class="cmd-icon">🧹</span>Tuvalet Temizlet
+                    </button>
+                    <button class="cmd-btn" onclick="interact('berat', 'maas')">
+                        <span class="cmd-icon">💸</span>Maaş Kes
+                    </button>
+                    <button class="cmd-btn" style="color:#ff4444" onclick="interact('berat', 'tokat')">
+                        <span class="cmd-icon">👋</span>Sanal Tokat
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="minion-card" id="card-gurkan">
+            <div class="minion-header">
+                <span class="minion-name">GÜRKAN</span>
+                <span class="minion-title">KADROLU YAMAK</span>
+            </div>
+            <div class="minion-body">
+                <div class="fear-meter-box">
+                    <div class="fear-label"><span>Korku Seviyesi</span><span id="fear-val-gurkan">%15</span></div>
+                    <div class="progress-bg"><div class="progress-fill" id="fear-bar-gurkan" style="width: 15%"></div></div>
+                </div>
+                
+                <div class="status-msg" id="msg-gurkan">"Patatesleri bitirmek üzereyim..."</div>
+
+                <div class="action-grid">
+                    <button class="cmd-btn" onclick="interact('gurkan', 'patates')">
+                        <span class="cmd-icon">🥔</span>Patates Soydur
+                    </button>
+                    <button class="cmd-btn" onclick="interact('gurkan', 'kose')">
+                        <span class="cmd-icon">🧍</span>Tek Ayak Beklet
+                    </button>
+                    <button class="cmd-btn" onclick="interact('gurkan', 'sus')">
+                        <span class="cmd-icon">🤐</span>Sus Emri Ver
+                    </button>
+                    <button class="cmd-btn" style="color:#ff4444" onclick="interact('gurkan', 'kov')">
+                        <span class="cmd-icon">🚪</span>Kov (Şakadan)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="minion-card hasan-card">
+            <div class="minion-header">
+                <span class="minion-name">HASAN</span>
+                <span class="minion-title">VEZİR-İ AZAM (SAĞ KOL)</span>
+            </div>
+            <div class="minion-body">
+                <div class="status-msg" id="msg-hasan" style="color:#fff;">"Müdürüm siz keyfinize bakın, ben buradayım."</div>
+                <button class="consult-btn" onclick="consultHasan()">🤝 HASAN'A DANIŞ / ONAY AL</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Değişkenler
+        let fearBerat = 10;
+        let fearGurkan = 15;
+
+        function openApp() {
+            document.getElementById('splash').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('splash').style.display = 'none';
+                document.getElementById('main-app').style.display = 'block';
+            }, 1000);
+        }
+
+        function interact(who, action) {
+            const msgBox = document.getElementById(`msg-${who}`);
+            const card = document.getElementById(`card-${who}`);
+            const fearBar = document.getElementById(`fear-bar-${who}`);
+            const fearVal = document.getElementById(`fear-val-${who}`);
+            
+            let response = "";
+            let fearIncrease = 0;
+
+            // Titreşim
+            if(navigator.vibrate) navigator.vibrate(50);
+
+            // Reaksiyonlar
+            if (who === 'berat') {
+                if (action === 'bakkal') {
+                    response = "Berat: 'Hemen koşuyorum müdürüm, para üstü sizde kalsın!'";
+                    fearIncrease = 5;
+                } else if (action === 'temizlik') {
+                    response = "Berat: 'Müdürüm yapmayın... Tamam en ince ayrıntısına kadar siliyorum.'";
+                    fearIncrease = 10;
+                } else if (action === 'maas') {
+                    response = "Berat: 'Abi zaten asgari ücretin yarısını alıyorum, etme!'";
+                    fearIncrease = 20;
+                    card.classList.add('shake'); // Kartı titret
+                } else if (action === 'tokat') {
+                    response = "Berat: 'Ah! Elleriniz dert görmesin şefim, hak ettim.'";
+                    fearIncrease = 15;
+                    card.classList.add('shake');
+                    if(navigator.vibrate) navigator.vibrate([100,50,100]);
+                }
+                
+                fearBerat = Math.min(100, fearBerat + fearIncrease);
+                fearBar.style.width = fearBerat + '%';
+                fearVal.innerText = '%' + fearBerat;
+
+            } else if (who === 'gurkan') {
+                if (action === 'patates') {
+                    response = "Gürkan: 'Müdürüm parmaklarım nasır tuttu ama emrederseniz sabaha kadar soyarım.'";
+                    fearIncrease = 5;
+                } else if (action === 'kose') {
+                    response = "Gürkan: 'Tamam müdürüm geçtim köşeye, tek ayak üstündeyim. Affet beni.'";
+                    fearIncrease = 10;
+                } else if (action === 'sus') {
+                    response = "Gürkan: (Sessizce ağlıyor ve başını öne eğiyor)";
+                    fearIncrease = 5;
+                } else if (action === 'kov') {
+                    response = "Gürkan: 'Abi yapma çoluğum çocuğum... Ha bekarım ama olsun, kovma!'";
+                    fearIncrease = 25;
+                    card.classList.add('shake');
+                    if(navigator.vibrate) navigator.vibrate([100,50,100]);
+                }
+
+                fearGurkan = Math.min(100, fearGurkan + fearIncrease);
+                fearBar.style.width = fearGurkan + '%';
+                fearVal.innerText = '%' + fearGurkan;
+            }
+
+            msgBox.innerText = response;
+            msgBox.style.color = "#ffdd00";
+
+            // Animasyonu temizle
+            setTimeout(() => {
+                card.classList.remove('shake');
+                msgBox.style.color = "#ddd";
+            }, 1000);
+        }
+
+        function consultHasan() {
+            const msgs = [
+                "Hasan: 'Müdürüm Berat çok şımarmıştı, iyi yaptınız.'",
+                "Hasan: 'Gürkan'ın kulağını biraz daha çekin bence, gevşedi.'",
+                "Hasan: 'Müdürüm siz elinizi yormayın, ben depoda döverim onları.'",
+                "Hasan: 'Eskişehir'de sizin gibisi gelmedi müdürüm, bunlar kıymet bilmiyor.'",
+                "Hasan: 'Onaylıyorum müdürüm. Bastığınız yer titresin!'"
+            ];
+            const msgBox = document.getElementById('msg-hasan');
+            msgBox.innerText = msgs[Math.floor(Math.random() * msgs.length)];
+            
+            // Hasan'a basınca diğerlerinin korkusu artsın
+            fearBerat = Math.min(100, fearBerat + 5);
+            fearGurkan = Math.min(100, fearGurkan + 5);
+            document.getElementById('fear-bar-berat').style.width = fearBerat + '%';
+            document.getElementById('fear-bar-gurkan').style.width = fearGurkan + '%';
+        }
+
+    </script>
+</body>
+</html>
