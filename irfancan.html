@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>👑 İMPARATOR İRFAN</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Roboto:wght@400;700&display=swap');
+
+        /* GENEL AYARLAR - KAOS VE İHTİŞAM */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #050505;
+            color: #fff;
+            font-family: 'Roboto', sans-serif;
+            overflow-x: hidden;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Arkaplan Efekti */
+        .bg-glow {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 150vw;
+            height: 150vw;
+            background: radial-gradient(circle, rgba(212,175,55,0.15) 0%, rgba(0,0,0,1) 70%);
+            z-index: -1;
+            animation: pulseGlow 5s infinite alternate;
+        }
+
+        @keyframes pulseGlow { 0% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* GİRİŞ EKRANI (SPLASH SCREEN) */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s ease;
+        }
+
+        .imperial-seal {
+            font-family: 'Cinzel', serif;
+            font-size: 3rem;
+            color: #D4AF37; /* Altın */
+            text-shadow: 0 0 20px #D4AF37;
+            margin-bottom: 20px;
+            animation: textShine 2s infinite alternate;
+        }
+
+        .enter-btn {
+            padding: 15px 40px;
+            background: transparent;
+            border: 2px solid #D4AF37;
+            color: #D4AF37;
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            font-family: 'Cinzel', serif;
+        }
+
+        .enter-btn:hover {
+            background: #D4AF37;
+            color: #000;
+            box-shadow: 0 0 30px #D4AF37;
+        }
+
+        /* ANA EKRAN */
+        #main-app {
+            display: none; /* Başlangıçta gizli */
+            width: 100%;
+            max-width: 420px;
+            height: 100vh;
+            display: flex; /* Flex olacak ama JS ile kontrol edeceğiz */
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Üst Header */
+        .header-panel {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 1px solid #333;
+            background: linear-gradient(180deg, #1a1a1a 0%, #000 100%);
+        }
+
+        .header-title {
+            font-family: 'Cinzel', serif;
+            color: #D4AF37;
+            font-size: 1.8rem;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+        
+        .header-sub {
+            color: #888;
+            font-size: 0.8rem;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        /* Kayan Yazı */
+        .ticker-wrap {
+            width: 100%;
+            background: #D4AF37;
+            color: #000;
+            overflow: hidden;
+            height: 30px;
+            line-height: 30px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .ticker {
+            display: inline-block;
+            white-space: nowrap;
+            animation: ticker 15s linear infinite;
+        }
+
+        @keyframes ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* Grid Alanı */
+        .grid-area {
+            flex: 1;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            overflow-y: auto;
+        }
+
+        .cmd-btn {
+            background: linear-gradient(145deg, #1e1e1e, #111);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 20px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cmd-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 3px;
+            background: #D4AF37;
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .cmd-btn:hover::before { transform: scaleX(1); }
+        .cmd-btn:active { transform: scale(0.95); background: #222; }
+
+        .btn-icon { font-size: 2rem; }
+        .btn-text { font-size: 0.9rem; font-weight: bold; color: #ddd; text-align: center; }
+
+        /* Büyük Altın Buton */
+        .gold-btn {
+            grid-column: span 2;
+            background: linear-gradient(45deg, #D4AF37, #AA8A28);
+            border: none;
+            box-shadow: 0 5px 15px rgba(212,175,55,0.3);
+        }
+        .gold-btn .btn-text { color: #000; font-size: 1.1rem; text-transform: uppercase; }
+
+        /* MODAL (SONUÇ EKRANI) */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .decree-box {
+            border: 2px solid #D4AF37;
+            padding: 30px;
+            background: #111;
+            position: relative;
+            max-width: 90%;
+        }
+
+        .decree-title {
+            color: #D4AF37;
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .decree-text {
+            font-size: 1.2rem;
+            line-height: 1.5;
+            margin-bottom: 30px;
+        }
+
+        .dismiss-btn {
+            background: #D4AF37;
+            color: #000;
+            border: none;
+            padding: 10px 30px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="bg-glow"></div>
+
+    <div id="splash-screen">
+        <div class="imperial-seal">♛<br>İRFAN</div>
+        <div style="color: #666; margin-bottom: 30px; font-size: 0.9rem; letter-spacing: 4px;">THE IMPERATOR</div>
+        <button class="enter-btn" onclick="openGate()">Huzura Çık</button>
+    </div>
+
+    <div id="main-app" style="display: none;">
+        
+        <div class="header-panel">
+            <h1 class="header-title">👑 İMPARATOR İRFAN</h1>
+            <div class="header-sub">Mekanın Mutlak Hakimi</div>
+        </div>
+
+        <div class="ticker-wrap">
+            <div class="ticker">
+                SON DAKİKA: İrfan Bey mekana girdi, dolar düştü! ••• Okey taşları İrfan Bey'e gelmek için kavga ediyor! ••• Mutfakta çıkan yangın İrfan Bey'in bakışıyla söndü! ••• İrfan İmparatorluğu %200 büyüdü!
+            </div>
+        </div>
+
+        <div class="grid-area">
+            <div class="cmd-btn" onclick="issueDecree('musteri')">
+                <span class="btn-icon">🤬</span>
+                <span class="btn-text">MÜŞTERİ ARIZA ÇIKARDI</span>
+            </div>
+
+            <div class="cmd-btn" onclick="issueDecree('cay')">
+                <span class="btn-icon">☕</span>
+                <span class="btn-text">ÇAY/KAHVE BEĞENİLMEDİ</span>
+            </div>
+
+            <div class="cmd-btn" onclick="issueDecree('okey')">
+                <span class="btn-icon">🎲</span>
+                <span class="btn-text">OKEYDE TAŞ GELMİYOR</span>
+            </div>
+
+            <div class="cmd-btn" onclick="issueDecree('garson')">
+                <span class="btn-icon">🐢</span>
+                <span class="btn-text">GARSON YAVAŞ KALDI</span>
+            </div>
+
+            <div class="cmd-btn" onclick="issueDecree('hesap')">
+                <span class="btn-icon">🧾</span>
+                <span class="btn-text">HESAP İTİRAZI VAR</span>
+            </div>
+
+            <div class="cmd-btn" onclick="issueDecree('muzik')">
+                <span class="btn-icon">🎵</span>
+                <span class="btn-text">MÜZİK BEĞENİLMEDİ</span>
+            </div>
+
+            <div class="cmd-btn gold-btn" onclick="issueDecree('moral')">
+                <span class="btn-icon">👑</span>
+                <span class="btn-text">İMPARATORUN CANI SIKKIN</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal">
+        <div class="decree-box">
+            <div class="decree-title">FERMAN-I İRFAN</div>
+            <div class="decree-text" id="decree-text"></div>
+            <button class="dismiss-btn" onclick="closeModal()">EMREDERSİNİZ</button>
+        </div>
+    </div>
+
+    <script>
+        // Giriş Ekranı Fonksiyonu
+        function openGate() {
+            const splash = document.getElementById('splash-screen');
+            const main = document.getElementById('main-app');
+            
+            splash.style.opacity = '0';
+            setTimeout(() => {
+                splash.style.display = 'none';
+                main.style.display = 'flex';
+            }, 1000);
+        }
+
+        // Fermanlar (Cevaplar)
+        function issueDecree(type) {
+            const modal = document.getElementById('modal');
+            const text = document.getElementById('decree-text');
+            let content = "";
+
+            // Bekleme Efekti (Titreşim)
+            if(navigator.vibrate) navigator.vibrate(50);
+
+            switch(type) {
+                case 'musteri':
+                    content = "Kafalarını vurdurun! Şaka şaka... İrfan Bey'in huzurunda sesini yükselteni okey masasına gömeriz. Müşteriyi nazikçe sınır dışı edin!";
+                    break;
+                case 'cay':
+                    content = "Bu bir hakarettir! İrfan Bey'in mekanında çay soğuk olmaz, müşterinin dili yanmıştır heyecandan. Tazelesinler!";
+                    break;
+                case 'okey':
+                    content = "Hile serbest! İrfan Bey oynuyorsa o 4. taş gelmek zorundadır. Gelmiyorsa ıstaka masaya vurulur, oyun bozulur!";
+                    break;
+                case 'garson':
+                    content = "Yazık... İrfan Bey'in ışık hızıyla yarışmaya çalışıyorlar. Affedin İmparatorum, onlar sadece fani kul!";
+                    break;
+                case 'hesap':
+                    content = "Kim o cengaver? İrfan İmparatorluğunda vergiye itiraz olmaz! Hesabı ikiyle çarpın, bir de 'İmparator Hizmet Bedeli' ekleyin!";
+                    break;
+                case 'muzik':
+                    content = "Müziği kapatın! En güzel ses İrfan Bey'in okey taşlarını masaya vururken çıkardığı 'ŞLAK' sesidir. Herkes bunu dinlesin!";
+                    break;
+                case 'moral':
+                    content = "DUYDUK DUYMADIK DEMEYİN! İmparatorun modu düşmüş. Bütün çaylar şirketten, okeyler İrfan Bey'den! Kalkın ayağa, büyüksün baba deyin!";
+                    break;
+            }
+
+            text.innerHTML = content;
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
